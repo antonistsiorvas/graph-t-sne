@@ -1,2 +1,6 @@
 starter/readdata
 *.o
+seq
+omp
+cilk
+pth
