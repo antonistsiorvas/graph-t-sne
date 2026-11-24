@@ -1,0 +1,18 @@
+k49_norm_10NN tree (L = 5): build 0.002 s | mass 0.000 s | walk 0.349 s Frep: max|Frep - ref| / max|ref| = 8.20e-03 | |Z - Zref| / Zref = 4.98e-03 
+k49_norm_10NN tree (L = 6): build 0.001 s | mass 0.000 s | walk 0.261 s Frep: max|Frep - ref| / max|ref| = 8.86e-03 | |Z - Zref| / Zref = 5.08e-03 
+k49_norm_10NN tree (L = 7): build 0.001 s | mass 0.000 s | walk 0.292 s Frep: max|Frep - ref| / max|ref| = 9.21e-03 | |Z - Zref| / Zref = 5.00e-03 
+k49_norm_10NN tree (L = 8): build 0.003 s | mass 0.003 s | walk 0.366 s Frep: max|Frep - ref| / max|ref| = 9.20e-03 | |Z - Zref| / Zref = 4.99e-03 
+k49_norm_10NN tree (L = 9): build 0.004 s | mass 0.009 s | walk 0.433 s Frep: max|Frep - ref| / max|ref| = 9.20e-03 | |Z - Zref| / Zref = 4.99e-03 
+k49_norm_10NN tree (L = 10): build 0.013 s | mass 0.031 s | walk 0.508 s Frep: max|Frep - ref| / max|ref| = 9.20e-03 | |Z - Zref| / Zref = 4.99e-03 
+k49_norm_10NN tree (L = 11): build 0.078 s | mass 0.164 s | walk 0.544 s Frep: max|Frep - ref| / max|ref| = 9.20e-03 | |Z - Zref| / Zref = 4.99e-03 
+k49_norm_10NN tree (L = 12): build 0.283 s | mass 0.738 s | walk 0.939 s Frep: max|Frep - ref| / max|ref| = 9.20e-03 | |Z - Zref| / Zref = 4.99e-03 
+com-Amazon tree (L = 5): build 0.010 s | mass 0.002 s | walk 29.174 s Frep: max|Frep - ref| / max|ref| = 7.06e-03 | |Z - Zref| / Zref = 4.98e-03 
+com-Amazon tree (L = 6): build 0.007 s | mass 0.001 s | walk 7.724 s Frep: max|Frep - ref| / max|ref| = 7.95e-03 | |Z - Zref| / Zref = 4.93e-03 
+com-Amazon tree (L = 7): build 0.008 s | mass 0.001 s | walk 3.871 s Frep: max|Frep - ref| / max|ref| = 8.12e-03 | |Z - Zref| / Zref = 4.85e-03 
+com-Amazon tree (L = 8): build 0.011 s | mass 0.002 s | walk 3.556 s Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03 
+com-Amazon tree (L = 9): build 0.013 s | mass 0.010 s | walk 5.033 s Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03 
+com-Amazon tree (L = 10): build 0.025 s | mass 0.053 s | walk 5.884 s Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03 
+com-Amazon tree (L = 11): build 0.107 s | mass 0.139 s | walk 7.439 s Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03 
+com-Amazon tree (L = 12): build 0.284 s | mass 0.869 s | walk 7.485 s Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03 
+
+[exited with code 0]

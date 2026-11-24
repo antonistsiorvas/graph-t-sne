@@ -10,5 +10,46 @@ double cond_row(const double *w, int64_t d, double u, double *p);
 /* mirror[k] = index of entry (j,i) for entry k = (i,j). */
 void build_mirror(const graph_t *W, int64_t *mirror);
 
+/* Fattr[2i], Fattr[2i+1] = attraction on point i (row i of (D - A) Y^T). */
+void attr_row(const graph_t *W, const double *P, const double *Y,
+              int64_t i, double *Fattr);
+
+/* Fixed-depth quadtree. The bounding square [x0, x0+side] x [y0, y0+side]
+ * is cut into a 2^L x 2^L grid of leaves; every level l = 0..L is kept.
+ * At level l, cell (cx, cy) has index c = cy * 2^l + cx.
+ * Its children are (2cx + a, 2cy + b), a, b in {0, 1}, at level l+1.  */
+#define MAXL 15
+typedef struct {
+  int L;
+  double x0, y0, side;
+  int64_t *start;            /* 4^L + 1: points of leaf c are          */
+  int64_t *perm;             /* perm[start[c] .. start[c+1]-1]         */
+  int64_t *cnt[MAXL + 1];    /* cnt[l][c]  = number of points in cell  */
+  double  *sumx[MAXL + 1];   /* sumx[l][c] = sum of their x            */
+  double  *sumy[MAXL + 1];   /* center of mass = (sumx, sumy) / cnt    */
+} quadtree_t;
+
+/* Default depth: about 8 points per leaf, L = round(log4(n / 8)).
+ * Measured best on k49 (L = 6) and com-Amazon (L = 8). */
+int tree_depth(int64_t n);
+
+/* Bounding square, counting sort of the n points into the leaves. */
+void tree_build(quadtree_t *T, const double *Y, int64_t n, int L);
+
+/* cnt, sumx, sumy of cell c at level l: from its points if l == L,
+ * else from its 4 children (so level l+1 must be done first). */
+void cell_mass(quadtree_t *T, const double *Y, int l, int64_t c);
+
+/* Barnes-Hut walk for point i: writes the UNnormalized repulsion
+ * sum_j (1+d^2)^-2 (y_i - y_j) to Frep[2i], Frep[2i+1] and returns
+ * this point's share of Z, sum_j (1+d^2)^-1. Divide Frep by Z later. */
+double rep_point(const quadtree_t *T, const double *Y, int64_t i,
+                 double theta, double *Frep);
+
+void tree_free(quadtree_t *T);
+
+/* max_i |x_i - ref_i| / max_i |ref_i| over m values. */
+double rel_err(const double *x, const double *ref, int64_t m);
+
 double now(void);   /* wall-clock time in seconds */
 #endif
