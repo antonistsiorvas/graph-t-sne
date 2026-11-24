@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "tsne.h"
 
 int main(int argc, char **argv) {
@@ -61,5 +62,17 @@ int main(int argc, char **argv) {
   printf("Frep: max|Frep - ref| / max|ref| = %.2e | |Z - Zref| / Zref = %.2e\n",
          rel_err(Frep, R.Frep, 2 * n), fabs(Z - R.Z) / R.Z);
   tree_free(&T);
+
+  /* step 4: the gradient */
+  double *grad = malloc(2 * n * sizeof *grad);
+  for (int64_t k = 0; k < 2 * n; k++) grad[k] = 4 * (Fattr[k] - Frep[k]);
+
+  /* save to results/<graph>-seq.mat */
+  const char *name = strrchr(argv[1], '/');
+  name = name ? name + 1 : argv[1];               /* "data/k49" -> "k49" */
+  char path[4096];
+  snprintf(path, sizeof path, "results/%s-seq.mat", name);
+  if (save_results(path, n, beta, Fattr, Frep, Z, grad)) return 1;
+  printf("saved %s\n", path);
   return 0;
 }

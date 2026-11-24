@@ -51,5 +51,10 @@ void tree_free(quadtree_t *T);
 /* max_i |x_i - ref_i| / max_i |ref_i| over m values. */
 double rel_err(const double *x, const double *ref, int64_t m);
 
+/* Write beta (n x 1), Fattr, Frep, grad (2 x n) and Z to a MAT v7.3 file,
+ * same variable names as <graph>-ref.mat (save.c). */
+int save_results(const char *path, int64_t n, double *beta, double *Fattr,
+                 double *Frep, double Z, double *grad);
+
 double now(void);   /* wall-clock time in seconds */
 #endif
