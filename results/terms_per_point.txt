@@ -1,0 +1,2 @@
+data/k49_norm_10NN n=38547 L=6 theta=0.50 | per point: 219 far cells + 347 near points = 566 terms (max 848), direct sum n-1 = 38546 | points not covered exactly once: 0
+data/com-Amazon n=334863 L=8 theta=0.50 | per point: 375 far cells + 210 near points = 584 terms (max 1579), direct sum n-1 = 334862 | points not covered exactly once: 0

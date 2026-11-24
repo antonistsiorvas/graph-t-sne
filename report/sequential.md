@@ -81,6 +81,26 @@ is not tuned to these graphs. The accuracy does not depend on $L$
 | k49_norm_10NN       | 0.35 | **0.26** | 0.29 | 0.37     | 0.43 | 0.51 | 0.54 | 0.94 |
 | com-Amazon          | 29.2 | 7.7      | 3.9  | **3.6**  | 5.0  | 5.9  | 7.4  | 7.5  |
 
+**Work per point.** To see what the tree saves, `src/count_terms.c` repeats the walk
+but, instead of forces, counts for each point the cells accepted as one body and the
+points added one by one at near leaves, and checks that these terms cover every other
+point exactly once (Table 1b). Each point computes about 570 terms instead of $n - 1$:
+68× fewer on k49 and 570× fewer on com-Amazon. The count barely grows with $n$
+(566 → 584 for 8.7× the points), as expected from the roughly logarithmic cost of
+Barnes–Hut. The walk time therefore grows almost linearly with $n$; the remaining
+difference is in the time per term, 6.5 ns on k49 against 14.4 ns on com-Amazon
+(walk time of Table 3 divided by $n \times$ terms per point), which is
+consistent with cache effects (the coordinates of com-Amazon, 5.4 MB, do not fit in the
+1.25 MB L2 per core; those of k49, 0.6 MB, do), not yet confirmed by measurement.
+
+*Table 1b. Terms per point in the walk at the default $L$, $\theta = 0.5$
+(`results/terms_per_point.txt`).*
+
+| graph         | $L$ | far cells | near points | terms (max)  | $n - 1$ | covered exactly once |
+|---------------|-----|-----------|-------------|--------------|---------|----------------------|
+| k49_norm_10NN | 6   | 219       | 347         | 566 (848)    | 38,546  | all points           |
+| com-Amazon    | 8   | 375       | 210         | 584 (1,579)  | 334,862 | all points           |
+
 **Correctness.** Table 2 compares with the course's reference. $\beta$ and
 $F^{\mathrm{attr}}$ agree to the bisection tolerance on the weighted k49 and to round-off
 on the unweighted com-Amazon, where every row is uniform. The Barnes–Hut errors are below
