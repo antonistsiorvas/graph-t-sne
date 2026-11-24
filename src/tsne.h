@@ -7,7 +7,8 @@
  * Writes p[0..d-1] = p_{j|i} and returns beta_i (0 if uniform). */
 double cond_row(const double *w, int64_t d, double u, double *p);
 
-/* mirror[k] = index of entry (j,i) for entry k = (i,j). */
+/* mirror[k] = index of entry (j,i) for entry k = (i,j).
+ * One counter per column, O(nnz); sequential (see tsne.c). */
 void build_mirror(const graph_t *W, int64_t *mirror);
 
 /* Fattr[2i], Fattr[2i+1] = attraction on point i (row i of (D - A) Y^T). */

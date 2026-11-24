@@ -1,0 +1,11 @@
+# build_mirror: binary search (old) vs one counter per column (current), 2026-11-24.
+# Both run on the same graph in one program (-O3 -march=native), output compared
+# entry by entry. Two runs per graph.
+data/k49_norm_10NN: binary search 0.0159 s | counter 0.0029 s | differences 0
+data/k49_norm_10NN: binary search 0.0172 s | counter 0.0024 s | differences 0
+data/com-Amazon: binary search 0.0716 s | counter 0.0146 s | differences 0
+data/com-Amazon: binary search 0.0712 s | counter 0.0100 s | differences 0
+#
+# Phase P, median of 5 full ./seq runs (results/seq_timings.txt):
+#   binary search: k49_norm_10NN 0.203 s (0.198-0.229) | com-Amazon 0.118 s (0.111-0.124)
+#   counter:       k49_norm_10NN 0.203 s (0.189-0.212) | com-Amazon 0.048 s (0.037-0.057)

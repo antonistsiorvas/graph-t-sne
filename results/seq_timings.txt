@@ -1,0 +1,60 @@
+## k49_norm_10NN run 1
+P: 0.210 s | max|beta - ref| = 1.22e-04 | sum P = 0.999999999999982
+Fattr: 0.002 s | max|Fattr - ref| / max|ref| = 1.24e-05
+tree (L = 6): build 0.001 s | mass 0.000 s | walk 0.147 s
+Frep: max|Frep - ref| / max|ref| = 8.86e-03 | |Z - Zref| / Zref = 5.08e-03
+saved results/k49_norm_10NN-seq.mat
+## k49_norm_10NN run 2
+P: 0.203 s | max|beta - ref| = 1.22e-04 | sum P = 0.999999999999982
+Fattr: 0.001 s | max|Fattr - ref| / max|ref| = 1.24e-05
+tree (L = 6): build 0.000 s | mass 0.000 s | walk 0.131 s
+Frep: max|Frep - ref| / max|ref| = 8.86e-03 | |Z - Zref| / Zref = 5.08e-03
+saved results/k49_norm_10NN-seq.mat
+## k49_norm_10NN run 3
+P: 0.198 s | max|beta - ref| = 1.22e-04 | sum P = 0.999999999999982
+Fattr: 0.002 s | max|Fattr - ref| / max|ref| = 1.24e-05
+tree (L = 6): build 0.000 s | mass 0.000 s | walk 0.141 s
+Frep: max|Frep - ref| / max|ref| = 8.86e-03 | |Z - Zref| / Zref = 5.08e-03
+saved results/k49_norm_10NN-seq.mat
+## k49_norm_10NN run 4
+P: 0.212 s | max|beta - ref| = 1.22e-04 | sum P = 0.999999999999982
+Fattr: 0.001 s | max|Fattr - ref| / max|ref| = 1.24e-05
+tree (L = 6): build 0.000 s | mass 0.000 s | walk 0.144 s
+Frep: max|Frep - ref| / max|ref| = 8.86e-03 | |Z - Zref| / Zref = 5.08e-03
+saved results/k49_norm_10NN-seq.mat
+## k49_norm_10NN run 5
+P: 0.189 s | max|beta - ref| = 1.22e-04 | sum P = 0.999999999999982
+Fattr: 0.002 s | max|Fattr - ref| / max|ref| = 1.24e-05
+tree (L = 6): build 0.000 s | mass 0.000 s | walk 0.130 s
+Frep: max|Frep - ref| / max|ref| = 8.86e-03 | |Z - Zref| / Zref = 5.08e-03
+saved results/k49_norm_10NN-seq.mat
+## com-Amazon run 1
+P: 0.057 s | max|beta - ref| = 0.00e+00 | sum P = 0.999999999999344
+Fattr: 0.010 s | max|Fattr - ref| / max|ref| = 7.89e-16
+tree (L = 8): build 0.007 s | mass 0.003 s | walk 2.495 s
+Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03
+saved results/com-Amazon-seq.mat
+## com-Amazon run 2
+P: 0.037 s | max|beta - ref| = 0.00e+00 | sum P = 0.999999999999344
+Fattr: 0.010 s | max|Fattr - ref| / max|ref| = 7.89e-16
+tree (L = 8): build 0.005 s | mass 0.002 s | walk 3.531 s
+Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03
+saved results/com-Amazon-seq.mat
+## com-Amazon run 3
+P: 0.048 s | max|beta - ref| = 0.00e+00 | sum P = 0.999999999999344
+Fattr: 0.012 s | max|Fattr - ref| / max|ref| = 7.89e-16
+tree (L = 8): build 0.008 s | mass 0.004 s | walk 2.816 s
+Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03
+saved results/com-Amazon-seq.mat
+## com-Amazon run 4
+P: 0.039 s | max|beta - ref| = 0.00e+00 | sum P = 0.999999999999344
+Fattr: 0.010 s | max|Fattr - ref| / max|ref| = 7.89e-16
+tree (L = 8): build 0.005 s | mass 0.002 s | walk 3.028 s
+Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03
+saved results/com-Amazon-seq.mat
+## com-Amazon run 5
+P: 0.053 s | max|beta - ref| = 0.00e+00 | sum P = 0.999999999999344
+Fattr: 0.012 s | max|Fattr - ref| / max|ref| = 7.89e-16
+tree (L = 8): build 0.006 s | mass 0.002 s | walk 2.709 s
+Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03
+saved results/com-Amazon-seq.mat

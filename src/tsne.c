@@ -83,19 +83,19 @@ void attr_row(const graph_t *W, const double *P, const double *Y,
   Fattr[2 * i + 1] = fy;
 }
 
-/* For entry k = (i, j) find the index of entry (j, i).
- * MATLAB stores row indices sorted within each column -> binary search. */
+/* For entry k = (i, j) find the index of entry (j, i), which is in column i.
+ * Row indices are sorted within each column, and we visit the columns j in
+ * increasing order, so the entries pointing into column i arrive in the same
+ * order as column i's own entries: the next one matches column i's next slot.
+ * next[i] = first slot of column i not matched yet.
+ * Sequential: next[] carries state from one column to the next.          */
 void build_mirror(const graph_t *W, int64_t *mirror) {
+  int64_t *next = malloc(W->n * sizeof *next);
+  for (int64_t i = 0; i < W->n; i++) next[i] = W->colptr[i];
   for (int64_t j = 0; j < W->n; j++)
-    for (int64_t k = W->colptr[j]; k < W->colptr[j + 1]; k++) {
-      int64_t i = W->row[k];                         /* entry (i, j)        */
-      int64_t lo = W->colptr[i], hi = W->colptr[i + 1] - 1;
-      while (lo < hi) {                              /* find row j in col i */
-        int64_t mid = (lo + hi) / 2;
-        if (W->row[mid] < j) lo = mid + 1; else hi = mid;
-      }
-      mirror[k] = lo;
-    }
+    for (int64_t k = W->colptr[j]; k < W->colptr[j + 1]; k++)
+      mirror[k] = next[W->row[k]]++;               /* entry (i, j), i = row[k] */
+  free(next);
 }
 
 /* ---------------------------------------------------------------- */
