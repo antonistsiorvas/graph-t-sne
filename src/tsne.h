@@ -25,6 +25,8 @@ typedef struct {
   double x0, y0, side;
   int64_t *start;            /* 4^L + 1: points of leaf c are          */
   int64_t *perm;             /* perm[start[c] .. start[c+1]-1]         */
+  int64_t *leaf;             /* n: leaf of each point                  */
+  int64_t *next;             /* 4^L: scratch for the scatter           */
   int64_t *cnt[MAXL + 1];    /* cnt[l][c]  = number of points in cell  */
   double  *sumx[MAXL + 1];   /* sumx[l][c] = sum of their x            */
   double  *sumy[MAXL + 1];   /* center of mass = (sumx, sumy) / cnt    */
@@ -34,8 +36,16 @@ typedef struct {
  * Measured best on k49 (L = 6) and com-Amazon (L = 8). */
 int tree_depth(int64_t n);
 
-/* Bounding square, counting sort of the n points into the leaves. */
-void tree_build(quadtree_t *T, const double *Y, int64_t n, int L);
+/* Building the tree is a counting sort of the points by leaf, written out
+ * in each driver so each version can split its loops:
+ *   tree_init                          bounding square, arrays, start = 0
+ *   leaf[i] = point_leaf(i)            for every point
+ *   start[leaf[i] + 1]++               count
+ *   start[c+1] += start[c]             prefix sum (sequential)
+ *   next[c] = start[c]
+ *   perm[next[leaf[i]]++] = i          scatter                           */
+void    tree_init(quadtree_t *T, const double *Y, int64_t n, int L);
+int64_t point_leaf(const quadtree_t *T, const double *Y, int64_t i);
 
 /* cnt, sumx, sumy of cell c at level l: from its points if l == L,
  * else from its 4 children (so level l+1 must be done first). */
@@ -49,6 +59,10 @@ double rep_point(const quadtree_t *T, const double *Y, int64_t i,
 
 void tree_free(quadtree_t *T);
 
+/* Direct O(n^2) repulsion for point i: same outputs as rep_point,
+ * summed over all j != i. */
+double rep_direct_point(const double *Y, int64_t n, int64_t i, double *Frep);
+
 /* max_i |x_i - ref_i| / max_i |ref_i| over m values. */
 double rel_err(const double *x, const double *ref, int64_t m);
 
@@ -56,6 +70,10 @@ double rel_err(const double *x, const double *ref, int64_t m);
  * same variable names as <graph>-ref.mat (save.c). */
 int save_results(const char *path, int64_t n, double *beta, double *Fattr,
                  double *Frep, double Z, double *grad);
+
+/* Read back a file written by save_results (arrays of the sizes above). */
+int read_results(const char *path, int64_t n, double *beta, double *Fattr,
+                 double *Frep, double *Z, double *grad);
 
 double now(void);   /* wall-clock time in seconds */
 #endif

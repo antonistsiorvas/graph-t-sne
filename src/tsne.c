@@ -16,7 +16,7 @@ double rel_err(const double *x, const double *ref, int64_t m) {
     e = fmax(e, fabs(x[k] - ref[k]));
     r = fmax(r, fabs(ref[k]));
   }
-  return e / r;
+  return r > 0 ? e / r : e;            /* all-zero reference: absolute error */
 }
 
 /* For one row, at a given beta:
@@ -108,8 +108,8 @@ int tree_depth(int64_t n) {
   return L;
 }
 
-void tree_build(quadtree_t *T, const double *Y, int64_t n, int L) {
-  /* bounding square of all points */
+void tree_init(quadtree_t *T, const double *Y, int64_t n, int L) {
+  /* bounding square of all points (sequential: one pass, < 1 ms) */
   double xmin = Y[0], xmax = Y[0], ymin = Y[1], ymax = Y[1];
   for (int64_t i = 1; i < n; i++) {
     xmin = fmin(xmin, Y[2 * i]);     xmax = fmax(xmax, Y[2 * i]);
@@ -126,27 +126,22 @@ void tree_build(quadtree_t *T, const double *Y, int64_t n, int L) {
     T->sumy[l] = malloc(cells * sizeof(double));
   }
 
-  /* counting sort of the points by leaf */
-  int64_t side = (int64_t)1 << L, leaves = side * side;
-  double  h = T->side / side;                           /* leaf side */
-  int64_t *leaf = malloc(n * sizeof *leaf);
-  T->start = calloc(leaves + 1, sizeof(int64_t));
+  /* arrays of the counting sort */
+  int64_t leaves = (int64_t)1 << (2 * L);
+  T->start = calloc(leaves + 1, sizeof(int64_t));       /* counts start at 0 */
+  T->next  = malloc(leaves * sizeof(int64_t));
   T->perm  = malloc(n * sizeof(int64_t));
+  T->leaf  = malloc(n * sizeof(int64_t));
+}
 
-  for (int64_t i = 0; i < n; i++) {                     /* 1. leaf of each point */
-    int64_t cx = (int64_t)((Y[2 * i]     - T->x0) / h);
-    int64_t cy = (int64_t)((Y[2 * i + 1] - T->y0) / h);
-    if (cx > side - 1) cx = side - 1;                   /* points on the max edge */
-    if (cy > side - 1) cy = side - 1;
-    leaf[i] = cy * side + cx;
-    T->start[leaf[i] + 1]++;                            /* 2. count */
-  }
-  for (int64_t c = 0; c < leaves; c++)                  /* 3. prefix sum */
-    T->start[c + 1] += T->start[c];
-  int64_t *next = malloc(leaves * sizeof *next);        /* 4. scatter */
-  for (int64_t c = 0; c < leaves; c++) next[c] = T->start[c];
-  for (int64_t i = 0; i < n; i++) T->perm[next[leaf[i]]++] = i;
-  free(next); free(leaf);
+int64_t point_leaf(const quadtree_t *T, const double *Y, int64_t i) {
+  int64_t side = (int64_t)1 << T->L;                    /* leaves per row */
+  double  h = T->side / side;                           /* leaf side      */
+  int64_t cx = (int64_t)((Y[2 * i]     - T->x0) / h);
+  int64_t cy = (int64_t)((Y[2 * i + 1] - T->y0) / h);
+  if (cx > side - 1) cx = side - 1;                     /* points on the max edge */
+  if (cy > side - 1) cy = side - 1;
+  return cy * side + cx;
 }
 
 void cell_mass(quadtree_t *T, const double *Y, int l, int64_t c) {
@@ -215,5 +210,23 @@ double rep_point(const quadtree_t *T, const double *Y, int64_t i,
 
 void tree_free(quadtree_t *T) {
   for (int l = 0; l <= T->L; l++) { free(T->cnt[l]); free(T->sumx[l]); free(T->sumy[l]); }
-  free(T->start); free(T->perm);
+  free(T->start); free(T->next); free(T->perm); free(T->leaf);
+}
+
+/* ---------------------------------------------------------------- */
+/* Direct O(n^2) repulsion, to compare with Barnes-Hut               */
+
+double rep_direct_point(const double *Y, int64_t n, int64_t i, double *Frep) {
+  double xi = Y[2 * i], yi = Y[2 * i + 1];
+  double fx = 0, fy = 0, z = 0;
+  for (int64_t j = 0; j < n; j++) {
+    if (j == i) continue;
+    double dx = xi - Y[2 * j], dy = yi - Y[2 * j + 1];
+    double q = 1 / (1 + dx * dx + dy * dy);
+    z  += q;
+    fx += q * q * dx;
+    fy += q * q * dy;
+  }
+  Frep[2 * i] = fx; Frep[2 * i + 1] = fy;
+  return z;
 }

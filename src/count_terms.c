@@ -34,8 +34,13 @@ int main(int argc, char **argv) {
   int64_t n = S.n;
   int L = argc > 2 ? atoi(argv[2]) : tree_depth(n);
 
-  quadtree_t T;
-  tree_build(&T, S.Y0, n, L);
+  quadtree_t T;                                     /* build as in seq.c */
+  int64_t leaves = (int64_t)1 << (2 * L);
+  tree_init(&T, S.Y0, n, L);
+  for (int64_t i = 0; i < n; i++) { T.leaf[i] = point_leaf(&T, S.Y0, i); T.start[T.leaf[i] + 1]++; }
+  for (int64_t c = 0; c < leaves; c++) T.start[c + 1] += T.start[c];
+  for (int64_t c = 0; c < leaves; c++) T.next[c] = T.start[c];
+  for (int64_t i = 0; i < n; i++) T.perm[T.next[T.leaf[i]]++] = i;
   for (int l = L; l >= 0; l--)
     for (int64_t c = 0; c < ((int64_t)1 << (2 * l)); c++) cell_mass(&T, S.Y0, l, c);
 

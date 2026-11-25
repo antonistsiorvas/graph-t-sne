@@ -13,6 +13,30 @@ static void write_var(mat_t *f, const char *name, double *x, size_t rows, size_t
   Mat_VarFree(v);
 }
 
+/* read variable name, which must hold exactly len doubles, into x */
+static int read_var(mat_t *f, const char *name, double *x, size_t len) {
+  matvar_t *v = Mat_VarRead(f, name);
+  if (!v || v->data_type != MAT_T_DOUBLE || v->nbytes != len * sizeof(double)) {
+    fprintf(stderr, "variable %s: missing or wrong size\n", name);
+    if (v) Mat_VarFree(v);
+    return -1;
+  }
+  memcpy(x, v->data, len * sizeof(double));
+  Mat_VarFree(v);
+  return 0;
+}
+
+int read_results(const char *path, int64_t n, double *beta, double *Fattr,
+                 double *Frep, double *Z, double *grad) {
+  mat_t *f = Mat_Open(path, MAT_ACC_RDONLY);
+  if (!f) return -1;
+  int bad = read_var(f, "beta", beta, n) || read_var(f, "Fattr", Fattr, 2 * n)
+         || read_var(f, "Frep", Frep, 2 * n) || read_var(f, "Z", Z, 1)
+         || read_var(f, "grad", grad, 2 * n);
+  Mat_Close(f);
+  return bad ? -1 : 0;
+}
+
 int save_results(const char *path, int64_t n, double *beta, double *Fattr,
                  double *Frep, double Z, double *grad) {
   mat_t *f = Mat_CreateVer(path, NULL, MAT_FT_MAT73);

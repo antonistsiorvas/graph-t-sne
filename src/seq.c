@@ -1,78 +1,77 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "tsne.h"
+/* seq.c -- the sequential version: every loop runs on one thread.
+ * The other versions are this file with the loops split among threads. */
+#include "driver.h"
 
 int main(int argc, char **argv) {
-  if (argc < 2) { fprintf(stderr, "usage: %s data/<graph> [L]\n", argv[0]); return 1; }
-  int L = argc > 2 ? atoi(argv[2]) : 0;           /* quadtree depth: 2^L x 2^L leaves */
-  graph_t W; state_t S; ref_t R;
-  if (read_graph(argv[1], &W) || read_state(argv[1], &S) || read_ref(argv[1], &R)) return 1;
-  int64_t n = W.n, nnz = W.nnz;
-  if (L == 0) L = tree_depth(n);
+  run_t r;
+  if (run_init(&r, argc, argv)) return 1;
+  const graph_t *W = &r.W;
+  const double  *Y = r.S.Y0;
+  int64_t n = r.n, nnz = r.nnz;
+  times_t t = {0};
+  double t0, t1;
 
-  double  *beta   = malloc(n * sizeof *beta);
-  double  *Pc     = malloc(nnz * sizeof *Pc);     /* conditional p_{j|i} */
-  double  *P      = malloc(nnz * sizeof *P);      /* symmetric p_ij      */
-  int64_t *mirror = malloc(nnz * sizeof *mirror);
-
-  double t0 = now();
-  for (int64_t i = 0; i < n; i++) {               /* one row at a time */
-    int64_t s = W.colptr[i], d = W.colptr[i + 1] - s;
-    beta[i] = cond_row(W.val + s, d, S.u, Pc + s);
+  /* step 1: P */
+  t0 = now();
+  for (int64_t i = 0; i < n; i++) {                       /* one row at a time */
+    int64_t s = W->colptr[i], d = W->colptr[i + 1] - s;
+    r.beta[i] = cond_row(W->val + s, d, r.S.u, r.Pc + s);
   }
-  build_mirror(&W, mirror);
-  for (int64_t k = 0; k < nnz; k++)               /* symmetrize */
-    P[k] = (Pc[k] + Pc[mirror[k]]) / (2.0 * n);
-  double tP = now() - t0;
+  t1 = now();
+  build_mirror(W, r.mirror);
+  t.mirror = now() - t1;
+  for (int64_t k = 0; k < nnz; k++)                       /* symmetrize */
+    r.P[k] = (r.Pc[k] + r.Pc[r.mirror[k]]) / (2.0 * n);
+  t.P = now() - t0;
 
-  double err = 0, sum = 0;
-  for (int64_t i = 0; i < n; i++) err = fmax(err, fabs(beta[i] - R.beta[i]));
-  for (int64_t k = 0; k < nnz; k++) sum += P[k];
-  printf("P: %.3f s | max|beta - ref| = %.2e | sum P = %.15f\n", tP, err, sum);
-
-  double *Fattr = malloc(2 * n * sizeof *Fattr);
+  /* step 2: attraction */
   t0 = now();
-  for (int64_t i = 0; i < n; i++) attr_row(&W, P, S.Y0, i, Fattr);
-  double tA = now() - t0;
-  printf("Fattr: %.3f s | max|Fattr - ref| / max|ref| = %.2e\n",
-         tA, rel_err(Fattr, R.Fattr, 2 * n));
+  for (int64_t i = 0; i < n; i++) attr_row(W, r.P, Y, i, r.Fattr);
+  t.attr = now() - t0;
 
-  /* repulsion: build the tree, centers of mass, walk */
+  /* step 3a: build the quadtree (counting sort of the points by leaf) */
   quadtree_t T;
+  int64_t leaves = (int64_t)1 << (2 * r.L);
   t0 = now();
-  tree_build(&T, S.Y0, n, L);
-  double tB = now() - t0;
+  tree_init(&T, Y, n, r.L);
+  for (int64_t i = 0; i < n; i++) {                       /* leaf, count */
+    T.leaf[i] = point_leaf(&T, Y, i);
+    T.start[T.leaf[i] + 1]++;
+  }
+  for (int64_t c = 0; c < leaves; c++) T.start[c + 1] += T.start[c];   /* prefix sum */
+  for (int64_t c = 0; c < leaves; c++) T.next[c] = T.start[c];
+  for (int64_t i = 0; i < n; i++) T.perm[T.next[T.leaf[i]]++] = i;      /* scatter */
+  t.build = now() - t0;
 
+  /* step 3b: centers of mass, leaves first, then up */
   t0 = now();
-  for (int l = L; l >= 0; l--)                    /* leaves first, then up */
-    for (int64_t c = 0; c < ((int64_t)1 << (2 * l)); c++)
-      cell_mass(&T, S.Y0, l, c);
-  double tM = now() - t0;
+  int64_t cells = leaves;                                 /* 4^l cells at level l */
+  for (int l = r.L; l >= 0; l--, cells /= 4)
+    for (int64_t c = 0; c < cells; c++) cell_mass(&T, Y, l, c);
+  t.mass = now() - t0;
 
-  double *Frep = malloc(2 * n * sizeof *Frep);
+  /* step 3c: the walk, then Z and normalization */
   t0 = now();
-  double Z = 0;
-  for (int64_t i = 0; i < n; i++) Z += rep_point(&T, S.Y0, i, S.theta, Frep);
-  for (int64_t k = 0; k < 2 * n; k++) Frep[k] /= Z;   /* normalize */
-  double tW = now() - t0;
-
-  printf("tree (L = %d): build %.3f s | mass %.3f s | walk %.3f s\n", L, tB, tM, tW);
-  printf("Frep: max|Frep - ref| / max|ref| = %.2e | |Z - Zref| / Zref = %.2e\n",
-         rel_err(Frep, R.Frep, 2 * n), fabs(Z - R.Z) / R.Z);
+  for (int64_t i = 0; i < n; i++) r.zi[i] = rep_point(&T, Y, i, r.S.theta, r.Frep);
+  for (int64_t i = 0; i < n; i++) r.Z += r.zi[i];          /* same order in every version */
+  for (int64_t k = 0; k < 2 * n; k++) r.Frep[k] /= r.Z;
+  t.walk = now() - t0;
   tree_free(&T);
 
   /* step 4: the gradient */
-  double *grad = malloc(2 * n * sizeof *grad);
-  for (int64_t k = 0; k < 2 * n; k++) grad[k] = 4 * (Fattr[k] - Frep[k]);
+  t0 = now();
+  for (int64_t k = 0; k < 2 * n; k++) r.grad[k] = 4 * (r.Fattr[k] - r.Frep[k]);
+  t.grad = now() - t0;
 
-  /* save to results/<graph>-seq.mat */
-  const char *name = strrchr(argv[1], '/');
-  name = name ? name + 1 : argv[1];               /* "data/k49" -> "k49" */
-  char path[4096];
-  snprintf(path, sizeof path, "results/%s-seq.mat", name);
-  if (save_results(path, n, beta, Fattr, Frep, Z, grad)) return 1;
-  printf("saved %s\n", path);
+  /* direct O(n^2) repulsion, to compare */
+  if (r.direct) {
+    t0 = now();
+    for (int64_t i = 0; i < n; i++) r.zi[i] = rep_direct_point(Y, n, i, r.Fdir);
+    for (int64_t i = 0; i < n; i++) r.Zdir += r.zi[i];
+    for (int64_t k = 0; k < 2 * n; k++) r.Fdir[k] /= r.Zdir;
+    t.direct = now() - t0;
+  }
+
+  run_finish(&r, "seq", 1, &t);
   return 0;
 }
