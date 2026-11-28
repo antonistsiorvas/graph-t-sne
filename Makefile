@@ -31,6 +31,9 @@ count_terms: src/count_terms.c src/tsne.c src/data.c src/tsne.h
 crossover: src/crossover.c src/tsne.c src/data.c src/tsne.h
 	$(CC) $(CFLAGS) -fopenmp -o $@ src/crossover.c src/tsne.c src/data.c $(MATIO) -lm
 
+agree: src/agree.c src/save.c src/tsne.c src/tsne.h
+	$(CC) $(CFLAGS) -o $@ src/agree.c src/save.c src/tsne.c $(MATIO) -lm
+
 clean:
-	rm -f seq omp cilk pth count_terms crossover
+	rm -f seq omp cilk pth count_terms crossover agree
 .PHONY: all clean

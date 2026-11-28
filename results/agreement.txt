@@ -1,0 +1,9 @@
+k49_norm_10NN omp  vs seq: beta 0.0e+00 | Fattr 0.0e+00 | Frep 1.4e-15 | Z 2.0e-16 | grad 1.2e-15
+k49_norm_10NN cilk vs seq: beta 0.0e+00 | Fattr 4.4e-16 | Frep 1.4e-15 | Z 0.0e+00 | grad 1.2e-15
+k49_norm_10NN pth  vs seq: beta 0.0e+00 | Fattr 0.0e+00 | Frep 9.8e-16 | Z 0.0e+00 | grad 8.9e-16
+com-Amazon omp  vs seq: beta 0.0e+00 | Fattr 0.0e+00 | Frep 1.4e-15 | Z 0.0e+00 | grad 5.0e-16
+com-Amazon cilk vs seq: beta 0.0e+00 | Fattr 1.4e-15 | Frep 1.1e-15 | Z 0.0e+00 | grad 9.5e-16
+com-Amazon pth  vs seq: beta 0.0e+00 | Fattr 0.0e+00 | Frep 1.1e-15 | Z 1.3e-16 | grad 3.9e-16
+coPapersDBLP omp  vs seq: beta 0.0e+00 | Fattr 0.0e+00 | Frep 2.6e-15 | Z 0.0e+00 | grad 1.0e-15
+coPapersDBLP cilk vs seq: beta 0.0e+00 | Fattr 2.3e-15 | Frep 2.2e-15 | Z 0.0e+00 | grad 1.9e-15
+coPapersDBLP pth  vs seq: beta 0.0e+00 | Fattr 0.0e+00 | Frep 7.5e-16 | Z 0.0e+00 | grad 3.0e-16
