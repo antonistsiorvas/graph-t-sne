@@ -27,12 +27,13 @@ weights are equal; otherwise it doubles an upper bound on $\beta_i$ until
 $H_i(\beta) \le \log u$, then bisects to $|H_i - \log u| < 10^{-5}$, using
 $(w_{ij}/\max_k w_{ik})^{\beta}$. Bisection works because $H_i$ falls monotonically from
 $\log d_i$ at $\beta = 0$. On k49, 34,098 of 38,547 rows need it, at 18.3 entropy
-evaluations per row on average. To symmetrize, `build_mirror` finds for each entry
+evaluations per row on average (`src/count_bisection.c`). To symmetrize, `build_mirror` finds for each entry
 $(i,j)$ the index of $(j,i)$: visiting the columns $j$ in increasing order, the entries
 pointing into column $i$ arrive in the order of column $i$'s own (sorted) rows, so with
 one counter per column the partner is `next[i]++` — the CSC transpose, $O(\mathrm{nnz})$.
-It replaced a binary search per entry: identical table, 5–7× faster (com-Amazon 71 → 12
-ms), but sequential, since `next[]` carries state from column to column.
+It replaced a binary search per entry: identical table, 12–22× faster (best of 5:
+com-Amazon 70 → 5.8 ms, coPapersDBLP 1.12 s → 50 ms; `src/mirror_compare.c`), but
+sequential, since `next[]` carries state from column to column.
 
 **Attraction.** `attr_row` computes row $i$ of $(D-A)Y^{\mathsf T}$ without forming $A$
 or $D$: for each neighbor it computes $A_{ij}$ on the fly and accumulates

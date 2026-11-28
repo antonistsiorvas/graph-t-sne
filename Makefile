@@ -34,6 +34,12 @@ crossover: src/crossover.c src/tsne.c src/data.c src/tsne.h
 agree: src/agree.c src/save.c src/tsne.c src/tsne.h
 	$(CC) $(CFLAGS) -o $@ src/agree.c src/save.c src/tsne.c $(MATIO) -lm
 
+count_bisection: src/count_bisection.c src/tsne.c src/data.c src/tsne.h
+	$(CC) $(CFLAGS) -o $@ src/count_bisection.c src/tsne.c src/data.c $(MATIO) -lm
+
+mirror_compare: src/mirror_compare.c src/tsne.c src/data.c src/tsne.h
+	$(CC) $(CFLAGS) -o $@ src/mirror_compare.c src/tsne.c src/data.c $(MATIO) -lm
+
 clean:
-	rm -f seq omp cilk pth count_terms crossover agree
+	rm -f seq omp cilk pth count_terms crossover agree count_bisection mirror_compare
 .PHONY: all clean

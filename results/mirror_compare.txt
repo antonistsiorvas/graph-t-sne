@@ -1,11 +1,10 @@
-# build_mirror: binary search (old) vs one counter per column (current), 2026-11-24.
-# Both run on the same graph in one program (-O3 -march=native), output compared
-# entry by entry. Two runs per graph.
-data/k49_norm_10NN: binary search 0.0159 s | counter 0.0029 s | differences 0
-data/k49_norm_10NN: binary search 0.0172 s | counter 0.0024 s | differences 0
-data/com-Amazon: binary search 0.0716 s | counter 0.0146 s | differences 0
-data/com-Amazon: binary search 0.0712 s | counter 0.0100 s | differences 0
+# build_mirror: binary search per entry (first version) vs one counter per column (current).
+# src/mirror_compare.c, best of 5 runs each, tables compared entry by entry (2026-11-28):
+data/k49_norm_10NN nnz=618158: binary search 0.0149 s | counter 0.0008 s | 19.5x faster | entries that differ: 0 (best of 5 runs)
+data/com-Amazon nnz=1851744: binary search 0.0695 s | counter 0.0058 s | 12.0x faster | entries that differ: 0 (best of 5 runs)
+data/coPapersDBLP nnz=30491458: binary search 1.1157 s | counter 0.0497 s | 22.4x faster | entries that differ: 0 (best of 5 runs)
 #
-# Phase P, median of 5 full ./seq runs (results/seq_timings.txt):
-#   binary search: k49_norm_10NN 0.203 s (0.198-0.229) | com-Amazon 0.118 s (0.111-0.124)
-#   counter:       k49_norm_10NN 0.203 s (0.189-0.212) | com-Amazon 0.048 s (0.037-0.057)
+# A first, single-run test (each version timed once, on freshly allocated memory,
+# so including its page faults) gave 5-7x: k49 16 vs 2.5 ms, com-Amazon 71 vs 12 ms.
+# Phase P, median of 5 full ./seq runs (before / after the switch):
+#   com-Amazon 0.118 s / 0.048 s; k49_norm_10NN 0.203 s / 0.203 s (bisection dominates)

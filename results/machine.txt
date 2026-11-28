@@ -1,3 +1,10 @@
+# NOTE: the output below is from lscpu, free and the compilers, run under WSL2.
+# lscpu reports "6 cores per socket, 2 threads per core", which is WSL's virtual
+# topology. The Intel Core i5-1235U actually has 2 performance cores (hyper-threaded,
+# up to 4.4 GHz) + 8 efficiency cores (up to 3.3 GHz) = 10 cores, 12 hardware threads.
+# This matters for the scaling results: beyond 2 threads, work also runs on the
+# slower efficiency cores.
+
 Architecture:                         x86_64
 CPU op-mode(s):                       32-bit, 64-bit
 Address sizes:                        39 bits physical, 48 bits virtual

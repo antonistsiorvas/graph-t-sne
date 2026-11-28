@@ -1,0 +1,3 @@
+data/k49_norm_10NN: 34098 of 38547 rows need the bisection (u = 10); entropy evaluations per such row: mean 18.3, max 24
+data/com-Amazon: 0 of 334863 rows need the bisection (u = 10); entropy evaluations per such row: mean 0.0, max 0
+data/coPapersDBLP: 0 of 540486 rows need the bisection (u = 10); entropy evaluations per such row: mean 0.0, max 0

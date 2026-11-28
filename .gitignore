@@ -7,3 +7,5 @@ pth
 count_terms
 crossover
 agree
+count_bisection
+mirror_compare
