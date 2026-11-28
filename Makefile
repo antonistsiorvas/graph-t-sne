@@ -40,6 +40,9 @@ count_bisection: src/count_bisection.c src/tsne.c src/data.c src/tsne.h
 mirror_compare: src/mirror_compare.c src/tsne.c src/data.c src/tsne.h
 	$(CC) $(CFLAGS) -o $@ src/mirror_compare.c src/tsne.c src/data.c $(MATIO) -lm
 
+embed: src/embed.c src/tsne.c src/data.c src/tsne.h
+	$(CC) $(CFLAGS) -fopenmp -o $@ src/embed.c src/tsne.c src/data.c $(MATIO) -lm
+
 clean:
-	rm -f seq omp cilk pth count_terms crossover agree count_bisection mirror_compare
+	rm -f seq omp cilk pth count_terms crossover agree count_bisection mirror_compare embed
 .PHONY: all clean
