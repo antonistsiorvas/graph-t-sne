@@ -111,7 +111,9 @@ def fig_time(rows, graph):
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False,
                bbox_to_anchor=(0.5, 1.12))
-    fig.suptitle("")
+    s = rows[(graph, "seq", 1)]                     # name the graph in the figure itself
+    fig.suptitle(f"{graph}  (n = {int(s['n']):,}, nnz = {int(s['nnz']):,})",
+                 y=1.24, fontsize=9, fontweight="bold")
     save(fig, f"time_{graph}")
 
 

@@ -16,3 +16,11 @@ com-Amazon tree (L = 11): build 0.107 s | mass 0.139 s | walk 7.439 s Frep: max|
 com-Amazon tree (L = 12): build 0.284 s | mass 0.869 s | walk 7.485 s Frep: max|Frep - ref| / max|ref| = 8.13e-03 | |Z - Zref| / Zref = 4.85e-03 
 
 [exited with code 0]
+coPapersDBLP tree (L = 5): build 0.008421 s | mass 0.001570 s | walk 36.768896 s Frep: max|Frep - ref| / max|ref| = 5.61e-03 | |Z - Zref| / Zref = 3.80e-03
+coPapersDBLP tree (L = 6): build 0.009299 s | mass 0.001803 s | walk 10.895851 s Frep: max|Frep - ref| / max|ref| = 5.56e-03 | |Z - Zref| / Zref = 3.66e-03
+coPapersDBLP tree (L = 7): build 0.011950 s | mass 0.001949 s | walk 4.365978 s Frep: max|Frep - ref| / max|ref| = 5.58e-03 | |Z - Zref| / Zref = 3.63e-03
+coPapersDBLP tree (L = 8): build 0.007487 s | mass 0.002033 s | walk 3.093266 s Frep: max|Frep - ref| / max|ref| = 5.58e-03 | |Z - Zref| / Zref = 3.63e-03
+coPapersDBLP tree (L = 9): build 0.010766 s | mass 0.005051 s | walk 3.627764 s Frep: max|Frep - ref| / max|ref| = 5.58e-03 | |Z - Zref| / Zref = 3.63e-03
+coPapersDBLP tree (L = 10): build 0.024519 s | mass 0.029312 s | walk 4.209379 s Frep: max|Frep - ref| / max|ref| = 5.58e-03 | |Z - Zref| / Zref = 3.63e-03
+coPapersDBLP tree (L = 11): build 0.076573 s | mass 0.113272 s | walk 4.135792 s Frep: max|Frep - ref| / max|ref| = 5.58e-03 | |Z - Zref| / Zref = 3.63e-03
+coPapersDBLP tree (L = 12): build 0.423634 s | mass 0.661769 s | walk 4.310197 s Frep: max|Frep - ref| / max|ref| = 5.58e-03 | |Z - Zref| / Zref = 3.63e-03

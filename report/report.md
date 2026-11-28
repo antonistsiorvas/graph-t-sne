@@ -54,14 +54,18 @@ center; acceptance needs two). Each walk returns its share $z_i$; then
 $Z = \sum_i z_i$ and $F^{\mathrm{rep}} /\!= Z$.
 
 **Choice of $L$.** Figure 1: shallow trees spend the walk in long leaf sums (com-Amazon
-29 s at $L = 5$), deep trees in visiting many small, mostly empty cells. The best depths
-leave about 9 (k49) and 5 (com-Amazon) points per leaf, so the default is
-$L = \mathrm{round}(\log_4(n/8))$, about 8 points per leaf; it picks the measured best on
-both graphs and depends only on $n$. Accuracy does not depend on $L$. With it, each point
-computes about 570 terms instead of $n - 1$ (k49: 566 = 219 cells + 347 points; com-Amazon:
-584), every other point covered exactly once (`src/count_terms.c`).
+29 s, coPapersDBLP 37 s at $L = 5$), deep trees in visiting many small, mostly empty cells,
+and their $4^L$ arrays make building and centers of mass grow (coPapersDBLP: 1.1 s at
+$L = 12$). The best depths on k49 and com-Amazon leave about 9 and 5 points per leaf, so
+the default is $L = \mathrm{round}(\log_4(n/8))$, about 8 points per leaf, depending only
+on $n$. Chosen from those two graphs, it was then confirmed on coPapersDBLP, swept only
+afterwards: the rule gives $L = 8$ (8.2 points per leaf), and $L = 8$ is the measured best
+(3.1 s; 3.6 s at $L = 9$, 4.4 s at $L = 7$). Accuracy does not depend on $L$. With it, each
+point computes 566–698 terms instead of $n - 1$ (k49: 566 = 219 cells + 347 points;
+com-Amazon: 584; coPapersDBLP: 698), every other point covered exactly once
+(`src/count_terms.c`).
 
-![Walk time against the depth $L$ (sequential, one run per $L$; `results/depth_sweep_seq.txt`).](figs/depth.png){width=48%}
+![Walk time against the depth $L$ (sequential, one run per $L$; `results/depth_sweep_seq.txt`, `scripts/depth_sweep.sh`).](figs/depth.png){width=48%}
 
 # 3. Parallelization
 
