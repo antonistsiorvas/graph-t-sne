@@ -1,0 +1,10 @@
+# ./omp data/com-Amazon, OMP_NUM_THREADS=12, 3 runs per wait policy (2026-11-25).
+# active = threads spin between parallel loops; passive = they sleep.
+# The mirror table runs on one thread; spinning threads slow it down.
+active P=0.084992 mirror=0.066480 walk=0.389411
+active P=0.030552 mirror=0.018922 walk=0.434042
+active P=0.085135 mirror=0.064810 walk=0.436792
+passive P=0.024717 mirror=0.011802 walk=0.425667
+passive P=0.022883 mirror=0.011388 walk=0.443235
+passive P=0.035916 mirror=0.012618 walk=0.482788
+# Full benchmark with the default (spinning) policy: results/timings_omp_active.txt
