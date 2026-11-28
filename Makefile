@@ -28,6 +28,9 @@ pth: src/pth.c $(DEPS)
 count_terms: src/count_terms.c src/tsne.c src/data.c src/tsne.h
 	$(CC) $(CFLAGS) -o $@ src/count_terms.c src/tsne.c src/data.c $(MATIO) -lm
 
+crossover: src/crossover.c src/tsne.c src/data.c src/tsne.h
+	$(CC) $(CFLAGS) -fopenmp -o $@ src/crossover.c src/tsne.c src/data.c $(MATIO) -lm
+
 clean:
-	rm -f seq omp cilk pth count_terms
+	rm -f seq omp cilk pth count_terms crossover
 .PHONY: all clean

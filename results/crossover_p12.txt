@@ -1,0 +1,10 @@
+# data/k49_norm_10NN, first m points of Y0, p = 12, theta = 0.50, median of 7 runs
+m=100 L=2 barnes_hut=0.005765 direct=0.001685 direct/bh=0.29 Frep_err=4.8e-04 Z_err=2.4e-04
+m=200 L=2 barnes_hut=0.006250 direct=0.001323 direct/bh=0.21 Frep_err=4.7e-04 Z_err=1.4e-04
+m=500 L=3 barnes_hut=0.007930 direct=0.001827 direct/bh=0.23 Frep_err=3.0e-03 Z_err=1.5e-03
+m=1000 L=3 barnes_hut=0.008716 direct=0.003023 direct/bh=0.35 Frep_err=3.1e-03 Z_err=1.5e-03
+m=2000 L=4 barnes_hut=0.010518 direct=0.005366 direct/bh=0.51 Frep_err=7.1e-03 Z_err=3.6e-03
+m=5000 L=5 barnes_hut=0.013237 direct=0.013052 direct/bh=0.99 Frep_err=8.6e-03 Z_err=4.9e-03
+m=10000 L=5 barnes_hut=0.015943 direct=0.039417 direct/bh=2.47 Frep_err=9.0e-03 Z_err=5.0e-03
+m=20000 L=6 barnes_hut=0.021611 direct=0.126972 direct/bh=5.88 Frep_err=8.8e-03 Z_err=5.1e-03
+m=38547 L=6 barnes_hut=0.038708 direct=0.444702 direct/bh=11.49 Frep_err=8.9e-03 Z_err=5.2e-03

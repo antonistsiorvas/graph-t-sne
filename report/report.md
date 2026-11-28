@@ -161,9 +161,15 @@ $O(n^2)$ repulsion takes 2,271 ms sequentially and 406–410 ms at 12 threads (5
 scales better than the walk: regular, compute-bound). Barnes–Hut (build + mass + walk) is
 **15.9× faster** sequentially and **8–9× faster** at 12 threads, while its error is
 $8.9\cdot10^{-3}$ instead of $1.2\cdot10^{-4}$ (the reference itself is Barnes–Hut at
-$\theta = 0.1$). **Below what $n$ is the direct sum faster?** [TODO: time both on the
-first $m$ points of k49, $m$ = 500 … 38,547, and report the crossover; data in
-`results/`.]
+$\theta = 0.1$). **Below what $n$ is the direct sum faster?** Timing both on the first
+$m$ points of k49 (`src/crossover.c`, median of 7; `results/crossover_p1.txt`,
+`crossover_p12.txt`): sequentially they tie at **$n \approx 1{,}000$** (1.3 ms each);
+below it the direct sum wins (0.58× at $m = 100$), above it Barnes–Hut wins by a factor that
+grows with $n$ (1.6× at 2,000, 4.9× at 10,000, 14.9× at 38,547). With 12 threads
+the crossover moves to **$n \approx 5{,}000$** (13 ms each): Barnes–Hut has a floor of about
+6 ms even for 100 points, from starting its 8 to 11 parallel loops (tree build, one per
+level for the centers of mass, walk, normalization), while the direct sum has two loops
+and costs 1.3–1.8 ms up to $m = 500$. Barnes–Hut stays within $10^{-2}$ of the direct sum at every $m$.
 
 # 5. Predict, then measure: coPapersDBLP
 
