@@ -117,7 +117,7 @@ def fig_time(rows, graph):
 
 def fig_speedup(rows):
     """Speedup T_seq / T(p) of the whole gradient (all phases), per graph."""
-    graphs = sorted({g for (g, v, p) in rows})
+    graphs = sorted({g for (g, v, p) in rows}, key=lambda g: rows[(g, "seq", 1)]["n"])
     fig, axes = plt.subplots(1, len(graphs), figsize=(7.2, 2.3), sharey=True)
     if len(graphs) == 1:
         axes = [axes]
@@ -183,7 +183,8 @@ def fig_scaling_n(rows):
     time_axis(ax)
     ax.yaxis.set_major_locator(ticker.LogLocator(base=10))
     ax.set_xticks(n)
-    ax.set_xticklabels([f"{g}\n{int(x):,}" for g, x in zip(graphs, n)], fontsize=6)
+    ax.set_xticklabels([f"{g}\nn = {int(x):,}" for g, x in zip(graphs, n)], fontsize=6,
+                       rotation=30, ha="right")
     ax.minorticks_off()
     ax.set_xlabel("graph, n")
     ax.set_ylabel("sequential time")
