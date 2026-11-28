@@ -102,7 +102,7 @@ gcc 13.3 (`-O3 -march=native`, `-fopenmp` / `-pthread`), OpenCilk 3.0 clang 19.1
 |---|---|---|---|---|
 | k49_norm_10NN | 1.2e-4 | 1.2e-5 | 8.9e-3 | 5.1e-3 |
 | com-Amazon | 0 | 7.9e-16 | 8.1e-3 | 4.9e-3 |
-| coPapersDBLP | [TODO] | [TODO] | [TODO] | [TODO] |
+| coPapersDBLP | 0 | 3.9e-15 | 5.6e-3 | 3.6e-3 |
 
 $\beta$ and $F^{\mathrm{attr}}$ agree to the bisection tolerance (weighted) or to round-off
 (unweighted); Barnes–Hut stays below $10^{-2}$.
@@ -119,35 +119,42 @@ $\beta$ and $F^{\mathrm{attr}}$ agree to the bisection tolerance (weighted) or t
 | | OpenMP 12 | 30 (11.9) | 5.4 | 12.4 | 6.6 | 437 | 494 (**5.4×**) |
 | | OpenCilk 12 | 32 (14.4) | 5.1 | 9.2 | 0.9 | 464 | 511 (**5.2×**) |
 | | Pthreads 12 | 32 (11.9) | 7.3 | 14.1 | 7.7 | 453 | 515 (**5.2×**) |
-| coPapersDBLP | seq | [TODO] | | | | | |
+| coPapersDBLP | seq | 574 (151) | 80.6 | 10.3 | 2.6 | 3,275 | 3,952 |
+| | OpenMP 12 | 261 (114) | 26.1 | 9.5 | 6.6 | 662 | 968 (**4.1×**) |
+| | OpenCilk 12 | 242 (115) | 25.0 | 9.6 | 2.0 | 657 | 938 (**4.2×**) |
+| | Pthreads 12 | 278 (105) | 23.6 | 9.4 | 6.3 | 637 | 957 (**4.1×**) |
 
-![Time per phase against threads $p$, com-Amazon. Dashed: sequential. (k49: `figs/time_k49_norm_10NN.png`.)](figs/time_com-Amazon.png)
+![Time per phase against threads $p$, com-Amazon. Dashed: sequential. (k49 and coPapersDBLP: `figs/time_k49_norm_10NN.png`, `figs/time_coPapersDBLP.png`.)](figs/time_com-Amazon.png)
 
 ![Speedup of the whole gradient over the sequential version.](figs/speedup.png){width=80%}
 
 **What limits each phase.**
-*Walk* (97% of the sequential time on com-Amazon) scales best: 5.9× (k49: 3.7×). Points are
+*Walk* (97% of the sequential time on com-Amazon, 83% on coPapersDBLP) scales best: 5.9×
+on com-Amazon, 4.9–5.1× on coPapersDBLP, 3.7× on k49. Points are
 independent and read-only on the tree, so the limits are the hardware and the balance:
 only 2 of the 10 cores are performance cores, threads 3–12 run on efficiency cores at
 about 3/4 of the clock and share caches, and per point costs differ (584 terms on average,
 up to 1,579). The jump from 1 to 2 threads is superlinear on com-Amazon (2.5×), which I
 attribute to the single thread not always running on a performance core (not verified).
-*$P$* reaches 3.2–3.5× on k49, where bisection dominates, but only 1.7–1.8× on com-Amazon,
-where rows are uniform and the sequential mirror is 12 of the 30 ms that remain (Amdahl).
-*Attraction* reaches only 0.7–2.8×: a few flops per nonzero against an indirect read of $y_j$
-and the streaming of `row`, `P`; it is memory-bound, and on k49 (1.5 ms) too short to
-amortize starting the threads. *Build and centers of mass* mostly get slower (build 0.2–0.8×; centers of mass 0.03–0.3× with OpenMP and Pthreads): they take
+*$P$* reaches 3.2–3.5× on k49, where bisection dominates, but only 1.7–1.8× on com-Amazon
+and 2.1–2.4× on coPapersDBLP, where rows are uniform and the sequential mirror stays: 12 of
+the 30 ms that remain on com-Amazon, 105–115 of 242–278 ms (44%) on coPapersDBLP (Amdahl).
+*Attraction* reaches 0.7–2.8× on k49 and com-Amazon but 3.1–3.4× on coPapersDBLP: a few
+flops per nonzero against an indirect read of $y_j$ and the streaming of `row`, `P`, so it is
+memory-bound; on k49 (1.5 ms) it is too short to amortize starting the threads, while the
+long rows of coPapersDBLP (median degree 34) give each thread enough work. *Build and centers of mass* mostly get slower (build 0.2–0.8×; centers of mass 0.03–0.3× with OpenMP and Pthreads): they take
 1–10 ms, the bounding box and prefix sum are sequential, and the counting sort pays one
 atomic per point. Starting threads costs as much as the work: Pthreads creates and joins
 $p$ threads in every `parallel_for` (9 calls for the 9 levels of the centers of mass) and
 passive OpenMP wakes its threads for every loop, both 6–8 ms at 12 threads on com-Amazon,
 while `cilk_for` runs a short loop on the worker that starts it unless others steal
 (0.9 ms, a 2.4× speedup).
-*Across graphs*: the walk grows about linearly in $n$ (terms per point 566 → 584), but its
-time per term doubles from k49 (6.5 ns) to com-Amazon (13.3 ns), consistent with
-com-Amazon's coordinates (5.4 MB) not fitting the 1.25 MB L2 while k49's (0.6 MB) do
-(not confirmed with counters). $P$ is faster on com-Amazon than on k49 despite 3× the
-nonzeros: no bisection.
+*Across graphs* (`figs/scaling_n.png`): the walk grows about linearly in $n$ (terms per
+point 566, 584, 698), but its time per term is 6.5 ns on k49, 13.3 ns on com-Amazon and
+8.7 ns on coPapersDBLP, so cache size alone does not explain it (Section 5). The phases
+proportional to nnz grow with nnz, not $n$: from com-Amazon to coPapersDBLP, nnz grows
+16.5×, $P$ 10×, attraction 7.7×, while $n$ grows 1.6×. $P$ is faster on com-Amazon than on
+k49 despite 3× the nonzeros: no bisection.
 
 **Barnes–Hut against the direct sum** (k49, parallel `rep_direct_point`): the direct
 $O(n^2)$ repulsion takes 2,271 ms sequentially and 406–410 ms at 12 threads (5.5×, it
@@ -169,18 +176,30 @@ com-Amazon speedup, the mirror staying sequential. Expected: the walk still domi
 but $P$ grows from 2% to 17% of the sequential time, and at 12 threads the mirror is 40%
 of $P$.
 
-| phase | predicted seq | measured seq | predicted OpenMP 12 | measured OpenMP 12 |
-|---|---|---|---|---|
-| $P$ (mirror) | 913 (253) | [TODO] | 499 (195) | [TODO] |
-| attraction | 171 | [TODO] | 88 | [TODO] |
-| build / mass | 12 / 3.3 | [TODO] | 20 / 11 | [TODO] |
-| walk | 4,192 | [TODO] | 706 | [TODO] |
-| total | 5,298 | [TODO] | 1,327 | [TODO] |
+| phase (ms) | predicted seq | measured seq | error | predicted OpenMP 12 | measured OpenMP 12 | error |
+|---|---|---|---|---|---|---|
+| $P$ (mirror) | 913 (253) | 574 (151) | −37% | 499 (195) | 261 (114) | −48% |
+| attraction | 171 | 81 | −53% | 88 | 26 | −71% |
+| build / mass | 12 / 3.3 | 10 / 2.6 | −16% / −21% | 20 / 11 | 9.5 / 6.6 | −52% / −38% |
+| walk | 4,192 | 3,275 | −22% | 706 | 662 | −6% |
+| total | 5,298 | 3,952 | −25% | 1,327 | 968 | −27% |
 
-[TODO: explain each difference. Candidates noted before the run: higher median degree
-(34 vs 4) shares the per-row cost of $P$ and attraction over more entries; the matrix
-arrays (> 1 GB) stream from memory; degree up to 3,299 can unbalance the attraction; a
-more clustered $Y_0$ gives more terms per point.]
+(All versions: `results/prediction_vs_measured_coPapersDBLP.md`.) The structure was right:
+the walk still dominates (83%), $P$ rises from 2% to 15% of the sequential time (predicted
+17%), and at 12 threads the mirror is 44% of $P$ (predicted 40%), which caps $P$ at 2.2×.
+Every phase except the tiny gradient (+3 ms) was overestimated, for two different reasons.
+*$P$ and attraction cost less per nonzero* than on com-Amazon: 18.8 vs 29.9 ns and
+2.6 vs 5.6 ns. This was the first risk noted before the run: with median degree 34
+instead of 4, the per-row work (loop setup, the min/max pass, loading $y_i$) is shared by
+8× more entries; the model scaled per nonzero what is partly per row.
+*The walk does more work but takes less time*: 698 terms per point instead of the assumed
+584 (+20%; the assumption was wrong), but 8.7 ns per term instead of 13.3 (−35%). Near-leaf
+terms, which need no division or square root, are 46% of the terms instead of 36%, and
+consecutive node numbers may be close in the plane, reusing the cells in cache; I did not
+verify which dominates.
+*In parallel*, the walk lands at −6% only by compensation: a faster sequential walk with a
+smaller speedup (4.9× vs 5.9× on com-Amazon). So the speedup of the whole gradient is
+4.1–4.2×, below com-Amazon's 5.2–5.4×, as the larger sequential mirror predicted.
 
 # 6. One bug: OpenMP got slower with more threads
 
